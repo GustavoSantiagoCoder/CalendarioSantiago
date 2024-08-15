@@ -1,54 +1,76 @@
-const html = document.querySelector('html')
-const checkbox = document.querySelector("input[name=theme]")
+document.addEventListener('DOMContentLoaded', () => {
+  const monthYear = document.getElementById('month-year');
+  const calendarDays = document.getElementById('calendar-days');
+  const prevMonthButton = document.getElementById('prev-month');
+  const nextMonthButton = document.getElementById('next-month');
+  const reminderModal = document.getElementById('reminder-modal');
+  const closeModalButton = document.getElementById('close-modal');
+  const saveReminderButton = document.getElementById('save-reminder');
+  const reminderText = document.getElementById('reminder-text');
+  const selectedDateInput = document.getElementById('selected-date');
+  let currentMonth = new Date().getMonth();
+  let currentYear = new Date().getFullYear();
+  const reminders = {};
 
-const getStyle = (element, style) => 
-    window
-        .getComputedStyle(element)
-        .getPropertyValue(style)
+  function renderCalendar() {
+      calendarDays.innerHTML = '';
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const lastDate = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-
-const initialColors = {
-  bodyColor: getStyle(html, '--body-color'),
-  headerColor: getStyle(html, '--header-color'),
-  headerButton: getStyle(html, '--header-button'),
-  colorWeekdays: getStyle(html, '--color-weekdays'),
-  currentDay: getStyle(html, '--current-day'),
-  eventColor: getStyle(html, '--event-color'),
-  eventColor: getStyle(html, '--event-color'),
-  colorDay: getStyle(html, '--color-day'),
-  modalEvent: getStyle(html, '--modal-event')
-  
-
-  
-}
-
-const darkMode = {
-  bodyColor:'#282a36',
-  headerColor: '#ff5555',
-  headerButton:'#bd93f9',
-  colorWeekdays: '#6272a4' ,
-  currentDay: '#f8f8f2',
-  eventColor: '#6272a4',
-  colorDay: '#44475a',
-  modalEvent: '#6272a4'
-  
-}
-
-const transformKey = key => 
-    "--" + key.replace(/([A-Z])/, "-$1").toLowerCase()
-
-
-const changeColors = (colors) => {
-    Object.keys(colors).map(key => {
-        html.style.setProperty(transformKey(key), colors[key]) 
-        console.log(transformKey(key), colors[key])
+      for (let i = 0; i < firstDay; i++) {
+          calendarDays.innerHTML += '<div class="calendar-day"></div>';
       }
-    )
-    console.log(colors)
-}
 
+      for (let date = 1; date <= lastDate; date++) {
+          const dayDiv = document.createElement('div');
+          dayDiv.className = 'calendar-day';
+          dayDiv.innerText = date;
+          dayDiv.dataset.date = `${currentYear}-${currentMonth + 1}-${date}`;
+          dayDiv.addEventListener('click', (event) => {
+              const selectedDate = event.target.dataset.date;
+              selectedDateInput.value = selectedDate;
+              reminderText.value = reminders[selectedDate] || '';
+              reminderModal.style.display = 'flex';
+          });
+          calendarDays.appendChild(dayDiv);
+      }
 
+      monthYear.innerText = `${currentYear}-${currentMonth + 1}`;
+  }
 
-checkbox.addEventListener("change", ({target}) => {
-    target.checked ? changeColors(darkMode) : changeColors(initialColors)
-})
+  prevMonthButton.addEventListener('click', () => {
+      currentMonth -= 1;
+      if (currentMonth < 0) {
+          currentMonth = 11;
+          currentYear -= 1;
+      }
+      renderCalendar();
+  });
+
+  nextMonthButton.addEventListener('click', () => {
+      currentMonth += 1;
+      if (currentMonth > 11) {
+          currentMonth = 0;
+          currentYear += 1;
+      }
+      renderCalendar();
+  });
+
+  closeModalButton.addEventListener('click', () => {
+      reminderModal.style.display = 'none';
+  });
+
+  saveReminderButton.addEventListener('click', () => {
+      const date = selectedDateInput.value;
+      const text = reminderText.value;
+      if (date && text) {
+          reminders[date] = text;
+      } else {
+          delete reminders[date];
+      }
+      reminderModal.style.display = 'none';
+      renderCalendar();
+  });
+
+  renderCalendar();
+});
