@@ -1,76 +1,72 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const monthYear = document.getElementById('month-year');
-  const calendarDays = document.getElementById('calendar-days');
-  const prevMonthButton = document.getElementById('prev-month');
-  const nextMonthButton = document.getElementById('next-month');
-  const reminderModal = document.getElementById('reminder-modal');
-  const closeModalButton = document.getElementById('close-modal');
-  const saveReminderButton = document.getElementById('save-reminder');
-  const reminderText = document.getElementById('reminder-text');
-  const selectedDateInput = document.getElementById('selected-date');
-  let currentMonth = new Date().getMonth();
-  let currentYear = new Date().getFullYear();
-  const reminders = {};
+const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+const year = 2024;
+let currentMonth = new Date().getMonth();
 
-  function renderCalendar() {
-      calendarDays.innerHTML = '';
-      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-      const lastDate = new Date(currentYear, currentMonth + 1, 0).getDate();
+// Lista de feriados para 2024 (considerando feriados nacionais)
+const holidays = {
+    0: [1],  // Janeiro: Confraternização Universal (1º de Janeiro)
+    1: [20], // Fevereiro: Carnaval (20 de Fevereiro)
+    3: [21], // Abril: Tiradentes (21 de Abril)
+    4: [1],  // Maio: Dia do Trabalho (1º de Maio)
+    8: [7],  // Setembro: Independência do Brasil (7 de Setembro)
+    9: [12], // Outubro: Nossa Senhora Aparecida (12 de Outubro)
+    10: [2, 15], // Novembro: Finados (2 de Novembro), Proclamação da República (15 de Novembro)
+    11: [25] // Dezembro: Natal (25 de Dezembro)
+};
 
-      for (let i = 0; i < firstDay; i++) {
-          calendarDays.innerHTML += '<div class="calendar-day"></div>';
-      }
+document.getElementById('month').textContent = monthNames[currentMonth];
+document.getElementById('year').textContent = year;
 
-      for (let date = 1; date <= lastDate; date++) {
-          const dayDiv = document.createElement('div');
-          dayDiv.className = 'calendar-day';
-          dayDiv.innerText = date;
-          dayDiv.dataset.date = `${currentYear}-${currentMonth + 1}-${date}`;
-          dayDiv.addEventListener('click', (event) => {
-              const selectedDate = event.target.dataset.date;
-              selectedDateInput.value = selectedDate;
-              reminderText.value = reminders[selectedDate] || '';
-              reminderModal.style.display = 'flex';
-          });
-          calendarDays.appendChild(dayDiv);
-      }
+function renderCalendar(month) {
+    const daysContainer = document.getElementById('days');
+    daysContainer.innerHTML = '';
+    const firstDay = new Date(year, month, 1).getDay();
+    const lastDate = new Date(year, month + 1, 0).getDate();
 
-      monthYear.innerText = `${currentYear}-${currentMonth + 1}`;
-  }
+    // Preenche os dias em branco antes do primeiro dia do mês
+    for (let i = 0; i < firstDay; i++) {
+        daysContainer.innerHTML += '<span></span>';
+    }
 
-  prevMonthButton.addEventListener('click', () => {
-      currentMonth -= 1;
-      if (currentMonth < 0) {
-          currentMonth = 11;
-          currentYear -= 1;
-      }
-      renderCalendar();
-  });
+    // Preenche os dias do mês e aplica cores especiais para domingos e feriados
+    for (let day = 1; day <= lastDate; day++) {
+        const dayOfWeek = new Date(year, month, day).getDay();
+        const isHoliday = holidays[month] && holidays[month].includes(day);
 
-  nextMonthButton.addEventListener('click', () => {
-      currentMonth += 1;
-      if (currentMonth > 11) {
-          currentMonth = 0;
-          currentYear += 1;
-      }
-      renderCalendar();
-  });
+        let className = "";
+        if (dayOfWeek === 0) { // Domingo
+            className = "sunday";
+        }
+        if (isHoliday) { // Feriado
+            className = "holiday";
+        }
 
-  closeModalButton.addEventListener('click', () => {
-      reminderModal.style.display = 'none';
-  });
+        daysContainer.innerHTML += `<span class="${className}">${day}</span>`;
+    }
+}
 
-  saveReminderButton.addEventListener('click', () => {
-      const date = selectedDateInput.value;
-      const text = reminderText.value;
-      if (date && text) {
-          reminders[date] = text;
-      } else {
-          delete reminders[date];
-      }
-      reminderModal.style.display = 'none';
-      renderCalendar();
-  });
+function updateCalendar() {
+    document.getElementById('month').textContent = monthNames[currentMonth];
+    renderCalendar(currentMonth);
+}
 
-  renderCalendar();
+// Navegação dos meses
+document.getElementById('prevMonth').addEventListener('click', () => {
+    if (currentMonth === 0) {
+        currentMonth = 11;
+    } else {
+        currentMonth--;
+    }
+    updateCalendar();
 });
+
+document.getElementById('nextMonth').addEventListener('click', () => {
+    if (currentMonth === 11) {
+        currentMonth = 0;
+    } else {
+        currentMonth++;
+    }
+    updateCalendar();
+});
+
+renderCalendar(currentMonth);

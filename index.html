@@ -1,39 +1,25 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendário com Lembretes</title>
+    <title>Calendário 2024</title>
     <link rel="stylesheet" href="kantesh.css">
 </head>
 <body>
     <div class="calendar-container">
-        <header>
-            <h1>Calendário</h1>
-            <button id="prev-month">&lt;</button>
-            <span id="month-year"></span>
-            <button id="next-month">&gt;</button>
-        </header>
-        <div class="calendar-grid">
-            <div class="day">Dom</div>
-            <div class="day">Seg</div>
-            <div class="day">Ter</div>
-            <div class="day">Qua</div>
-            <div class="day">Qui</div>
-            <div class="day">Sex</div>
-            <div class="day">Sáb</div>
+        <div class="calendar-header">
+            <button id="prevMonth">◀</button>
+            <div class="month-year">
+                <span id="month"></span> <span id="year">2024</span>
+            </div>
+            <button id="nextMonth">▶</button>
         </div>
-        <div id="calendar-days" class="calendar-grid"></div>
-    </div>
-
-    <!-- Modal para adicionar lembretes -->
-    <div id="reminder-modal" class="modal">
-        <div class="modal-content">
-            <span id="close-modal" class="close">&times;</span>
-            <h2>Adicionar Lembrete</h2>
-            <input type="hidden" id="selected-date">
-            <input type="text" id="reminder-text" placeholder="Digite seu lembrete">
-            <button id="save-reminder">Salvar</button>
+        <div class="calendar-body">
+            <div class="day-names">
+                <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+            </div>
+            <div class="days-grid" id="days"></div>
         </div>
     </div>
 
